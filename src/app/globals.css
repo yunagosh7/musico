@@ -6,8 +6,16 @@
 
 
 @layer components {
+  .button {
+    @apply p-4 rounded-3xl text-center
+  }
+
   .button-contained-primary {
-    @apply bg-white-75 p-4 rounded-3xl
+    @apply button bg-white-75  
+  }
+
+  .button-outlined-primary {
+    @apply button bg-transparent border-b-white-75 border-[1px]
   }
 }
 
@@ -32,4 +40,5 @@ body {
 
 * {
   font-family: var(--font-family);
+  box-sizing: border-box;
 }
