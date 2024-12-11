@@ -1,21 +1,23 @@
-import React from "react";
-
+import React from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { AuthService } from '../services/AuthService'
+import { User } from '../interfaces/User'
+import Image from 'next/image'
 import appLogo from "../app/assets/app-logo.svg";
-import Image from "next/image";
-import Link from "next/link";
-import { AuthService } from "../services/AuthService";
-import {  SubmitHandler, useForm } from "react-hook-form";
-import { User } from "../interfaces/User";
+import Link from 'next/link'
 
-import { useRouter } from "next/router";
+import { useRouter } from 'next/navigation'
+
 
 
 type FormDataType = { user: User }
 
-export default function LogIn() {
+
+export default function Register() {
+
   const router = useRouter()
 
-  const { handleSubmit, register} = useForm<{ user: User }>({
+  const { handleSubmit, register } = useForm<{ user: User }>({
     defaultValues: {
       user: {
         email: '',
@@ -24,18 +26,17 @@ export default function LogIn() {
     }
   })
 
-  const onSubmit: SubmitHandler<FormDataType> = async ({user}) => {
+  const onSubmit: SubmitHandler<FormDataType> = async ({ user }) => {
     try {
-      const res = await AuthService.logIn({ email: user.email, password: user.password })
+      const res = await AuthService.register({ email: user.email, password: user.password })
       console.log(res);
-    
-      if(!res.error) {
-        localStorage.setItem('token', JSON.stringify(res.data));
-        return router.push("/home")
-      }
-    } catch(er) {
+      if(!res.error) return router.replace("/home");
+      localStorage.setItem('token', JSON.stringify(res.data))
+
+    } catch (er) {
       console.error('Error singing in: ', er)
     }
+
   }
 
   return (
@@ -47,7 +48,7 @@ export default function LogIn() {
       <div className="flex w-full flex-col">
         <form onSubmit={handleSubmit(onSubmit)} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
           <div className="mb-4">
-            <label  className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
               Email
             </label>
             <input  {...register("user.email")} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="text" placeholder="Email" />
@@ -56,20 +57,17 @@ export default function LogIn() {
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
               Password
             </label>
-            <input {...register("user.password")} className="shadow appearance-none border border-red-500 rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="******************" />
-            <p className="text-red-500 text-xs italic">Please choose a password.</p>
+            <input {...register("user.password")} className="shadow appearance-none border  rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="******************" />
+            {/* <p className="text-red-500 text-xs italic">Please choose a password.</p> */}
           </div>
           <div className="flex items-center justify-between">
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
-              Sign In
+              Sign Up
             </button>
-            <a className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" href="#">
-              Forgot Password?
-            </a>
+            <Link className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" href="/register">Register</Link>
           </div>
         </form>
 
-        <Link className="text-center w-full" href="/register">Register</Link>
 
       </div>
     </div>

@@ -1,7 +1,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import appLogo from "../assets/app-logo.svg";
+import appLogo from "../app/assets/app-logo.svg";
 
 
 
