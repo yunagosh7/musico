@@ -6,6 +6,15 @@
 
 
 @layer components {
+
+  .input {
+    @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none 
+  } 
+
+  .song-card {
+    @apply w-32 h-36 md:w-44 md:h-52 cursor-pointer
+  } 
+  
   .button {
     @apply p-4 rounded-3xl text-center
   }
@@ -17,6 +26,7 @@
   .button-outlined-primary {
     @apply button bg-transparent border-b-white-75 border-[1px]
   }
+
 }
 
 :root {

@@ -1,21 +1,22 @@
-import React from "react";
-
 import appLogo from "../app/assets/app-logo.svg";
 import Image from "next/image";
 import Link from "next/link";
-import { AuthService } from "../services/AuthService";
-import {  SubmitHandler, useForm } from "react-hook-form";
-import { User } from "../interfaces/User";
+import { IUser } from "../interfaces/User";
 
+import { SubmitHandler, useForm } from "react-hook-form";
+import ControlledInput from "../app/components/controlled/ControlledInput";
+import { useAuthStore } from "../stores/AuthStore";
 import { useRouter } from "next/router";
 
-
-type FormDataType = { user: User }
+type FormState = {
+  user: Pick<IUser, "email" | "password">
+}
 
 export default function LogIn() {
+  const authStore = useAuthStore()
   const router = useRouter()
 
-  const { handleSubmit, register} = useForm<{ user: User }>({
+  const { control, handleSubmit, formState: { errors } } = useForm<FormState>({
     defaultValues: {
       user: {
         email: '',
@@ -24,18 +25,18 @@ export default function LogIn() {
     }
   })
 
-  const onSubmit: SubmitHandler<FormDataType> = async ({user}) => {
+  const onSubmit: SubmitHandler<FormState> = async ({ user }) => {
+
     try {
-      const res = await AuthService.logIn({ email: user.email, password: user.password })
-      console.log(res);
-    
-      if(!res.error) {
-        localStorage.setItem('token', JSON.stringify(res.data));
-        return router.push("/home")
-      }
+      await authStore.logIn({
+        email: user.email!,
+        password: user.password
+      })
+      router.push("/home")
     } catch(er) {
-      console.error('Error singing in: ', er)
+      console.error("Error logging in", er)
     }
+
   }
 
   return (
@@ -43,21 +44,51 @@ export default function LogIn() {
       <div>
         <Image src={appLogo} alt="Application logo" />
       </div>
-
+    
       <div className="flex w-full flex-col">
         <form onSubmit={handleSubmit(onSubmit)} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
           <div className="mb-4">
-            <label  className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
               Email
             </label>
-            <input  {...register("user.email")} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="text" placeholder="Email" />
+            <ControlledInput
+              type="email"
+              control={control}
+              name="user.email"
+              className="input"
+              rules={{
+                required: "Email is required",
+                validate: (email) => {
+                  console.log(email)
+                  const regExp = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                  if (!regExp.test(email?.toString() || "")) return "Invalid email format"
+                }
+              }}
+            />
+
           </div>
           <div className="mb-6">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
               Password
             </label>
-            <input {...register("user.password")} className="shadow appearance-none border border-red-500 rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="******************" />
-            <p className="text-red-500 text-xs italic">Please choose a password.</p>
+            <ControlledInput
+              type="password"
+              rules={{
+                required: "Password is required",
+              }}
+              control={control}
+              name="user.password"
+              className="input" />
+              {
+              errors.user?.email?.message || 
+              errors.user?.password?.message ?             
+               <p className="text-red-500 text-xs italic">
+                
+              {errors.user?.email?.message || 
+              errors.user?.password?.message}
+               </p> 
+             : ""}
+
           </div>
           <div className="flex items-center justify-between">
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
