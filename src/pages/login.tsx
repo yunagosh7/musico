@@ -1,12 +1,14 @@
 import appLogo from "../app/assets/app-logo.svg";
 import Image from "next/image";
 import Link from "next/link";
-import { IUser } from "../interfaces/User";
 
 import { SubmitHandler, useForm } from "react-hook-form";
 import ControlledInput from "../app/components/controlled/ControlledInput";
 import { useAuthStore } from "../stores/AuthStore";
 import { useRouter } from "next/router";
+import { useState } from "react";
+import { IUser } from "../interfaces/User";
+import { emailRequired } from "../rules/emailRequired";
 
 type FormState = {
   user: Pick<IUser, "email" | "password">
@@ -15,6 +17,7 @@ type FormState = {
 export default function LogIn() {
   const authStore = useAuthStore()
   const router = useRouter()
+  const [apiError, setApiError] = useState("")
 
   const { control, handleSubmit, formState: { errors } } = useForm<FormState>({
     defaultValues: {
@@ -26,6 +29,7 @@ export default function LogIn() {
   })
 
   const onSubmit: SubmitHandler<FormState> = async ({ user }) => {
+    setApiError("")
 
     try {
       await authStore.logIn({
@@ -33,8 +37,9 @@ export default function LogIn() {
         password: user.password
       })
       router.push("/home")
-    } catch(er) {
-      console.error("Error logging in", er)
+    } catch (er) {
+      console.error("Error: ", er)
+      setApiError(er.message)
     }
 
   }
@@ -44,7 +49,7 @@ export default function LogIn() {
       <div>
         <Image src={appLogo} alt="Application logo" />
       </div>
-    
+
       <div className="flex w-full flex-col">
         <form onSubmit={handleSubmit(onSubmit)} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
           <div className="mb-4">
@@ -56,14 +61,7 @@ export default function LogIn() {
               control={control}
               name="user.email"
               className="input"
-              rules={{
-                required: "Email is required",
-                validate: (email) => {
-                  console.log(email)
-                  const regExp = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-                  if (!regExp.test(email?.toString() || "")) return "Invalid email format"
-                }
-              }}
+              rules={emailRequired}
             />
 
           </div>
@@ -79,15 +77,18 @@ export default function LogIn() {
               control={control}
               name="user.password"
               className="input" />
-              {
-              errors.user?.email?.message || 
-              errors.user?.password?.message ?             
-               <p className="text-red-500 text-xs italic">
-                
-              {errors.user?.email?.message || 
-              errors.user?.password?.message}
-               </p> 
-             : ""}
+            {
+              errors.user?.email?.message ||
+                errors.user?.password?.message ||
+                apiError ?
+                <p className="text-red-500 text-xs italic mt-2">
+
+                  {errors.user?.email?.message ||
+                    errors.user?.password?.message ||
+                    apiError}
+                </p>
+                : ""}
+
 
           </div>
           <div className="flex items-center justify-between">

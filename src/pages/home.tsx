@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 
-import { useRouter } from 'next/navigation';
 import { SongService } from '../services/SongService';
 import Song from '../interfaces/Song';
 import SongCard from '../app/components/Cards/SongCard';
+import SongReproducer from '../app/components/layouts/SongReproducer';
 
 type Props = {
   songs: Song[]
@@ -15,32 +15,34 @@ export default function Home({
 }: Props) {
 
   console.log({ songs })
-  const router = useRouter()
   const [currentSong, setCurrentSong] = useState<Song | undefined>(undefined)
 
   const onCardClick = (song: Song) => {
+    setCurrentSong(undefined)
+    setTimeout(() => {
+
+      setCurrentSong(song)
+    }, 150)
     console.log(song)
-    setCurrentSong(song)
   }
 
   return (
     <div>
-      {songs?.length ?
-        songs.map((song, index) =>
+      <div className='flex flex-wrap'>
 
-          <SongCard
-            onCardClick={onCardClick}
-            key={index} song={song} />
-        )
-        : null}
+        {songs?.length ?
+          songs.map((song, index) =>
 
-        {currentSong ? (
-          <div>
-            <audio controls autoPlay>
-              <source src={currentSong.song_url}></source>
-            </audio>
-          </div>
-        ) : null}
+            <SongCard
+              onCardClick={onCardClick}
+              key={index} song={song} />
+          )
+          : null}
+      </div>
+
+      {currentSong ? (
+        <SongReproducer song={currentSong} />
+      ) : null}
     </div>
   )
 }

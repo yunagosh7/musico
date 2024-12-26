@@ -1,23 +1,27 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { AuthService } from '../services/AuthService'
-import { User } from '../interfaces/User'
+import { IUser } from '../interfaces/User'
 import Image from 'next/image'
 import appLogo from "../app/assets/app-logo.svg";
 import Link from 'next/link'
 
 import { useRouter } from 'next/navigation'
+import ControlledInput from '../app/components/controlled/ControlledInput'
+import { emailRequired } from '../rules/emailRequired'
+import { useAuthStore } from '../stores/AuthStore'
 
 
 
-type FormDataType = { user: User }
+type FormDataType = { user: IUser }
 
 
 export default function Register() {
+  const authStore = useAuthStore()
+  const [apiError, setApiError] = useState("");
 
   const router = useRouter()
 
-  const { handleSubmit, register } = useForm<{ user: User }>({
+  const { control, handleSubmit, formState: { errors } } = useForm<{ user: IUser }>({
     defaultValues: {
       user: {
         email: '',
@@ -27,14 +31,17 @@ export default function Register() {
   })
 
   const onSubmit: SubmitHandler<FormDataType> = async ({ user }) => {
+    setApiError("")
     try {
-      const res = await AuthService.register({ email: user.email, password: user.password })
-      console.log(res);
-      if(!res.error) return router.replace("/home");
-      localStorage.setItem('token', JSON.stringify(res.data))
-
+       await authStore.register({ 
+        email: user.email!, 
+        password: user.password 
+      })
+      router.push("/home");
     } catch (er) {
       console.error('Error singing in: ', er)
+      setApiError(er.message)
+
     }
 
   }
@@ -51,14 +58,38 @@ export default function Register() {
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
               Email
             </label>
-            <input  {...register("user.email")} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="text" placeholder="Email" />
-          </div>
+            <ControlledInput
+              type="email"
+              control={control}
+              name="user.email"
+              className="input"
+              rules={emailRequired}
+            />
+              </div>
           <div className="mb-6">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
               Password
             </label>
-            <input {...register("user.password")} className="shadow appearance-none border  rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="******************" />
+            <ControlledInput
+              type="password"
+              rules={{
+                required: "Password is required",
+              }}
+              control={control}
+              name="user.password"
+              className="input" />
             {/* <p className="text-red-500 text-xs italic">Please choose a password.</p> */}
+            {
+              errors.user?.email?.message || 
+              errors.user?.password?.message || 
+              apiError?             
+               <p className="text-red-500 text-xs italic mt-2">
+                
+              {errors.user?.email?.message || 
+              errors.user?.password?.message ||
+              apiError }
+               </p> 
+             : ""}
           </div>
           <div className="flex items-center justify-between">
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">

@@ -8,6 +8,7 @@ type AuthStore = {
     token: Session | undefined;
     logIn:  (user: AuthUser) => Promise<void>;
     logOut:  () => void;
+    register:  (user: AuthUser) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthStore>()(devtools(
@@ -19,6 +20,13 @@ export const useAuthStore = create<AuthStore>()(devtools(
                 const res = await AuthService.logIn({password: user.password, email: user.email})
                 if(res.error) throw res.error
                 set(() => ({ user: res.data.user, token: res.data.session }))
+                localStorage.setItem('token', JSON.stringify(res.data.session))
+                localStorage.setItem('user', JSON.stringify(res.data.user))
+            },
+            register: async (user) => {
+                const res = await AuthService.register({password: user.password, email: user.email})
+                if(res.error) throw res.error
+                set(() => ({ user: res.data.user!, token: res.data.session! }))
                 localStorage.setItem('token', JSON.stringify(res.data.session))
                 localStorage.setItem('user', JSON.stringify(res.data.user))
             },
