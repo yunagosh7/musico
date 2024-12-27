@@ -1,22 +1,22 @@
-import { create } from "zustand";
-import { devtools, persist } from 'zustand/middleware'
-import {   Session, User,  } from "@supabase/supabase-js";
-import { AuthService, AuthUser } from "../services/AuthService";
-import Song from "../interfaces/Song";
+import { create } from 'zustand';
+import { devtools, persist } from 'zustand/middleware';
+import Song from '../interfaces/Song';
 
 type SongStore = {
-    songs: [Song];
-    uploadFile:  (fileName) => Promise<void>;
-    
-}
+	songs: Song[];
+	addSong: (song: Song) => void;
+};
 
-export const useSongStore = create<SongStore>()(devtools(
-    persist(
-        (set) => ({
-            songs: [],
-        }),
-        {
-            name: 'SongStore'
-        }
-    )
-))
+export const useSongStore = create<SongStore>()(
+	devtools(
+		persist(
+			(set, get) => ({
+				songs: [],
+				addSong: (song) => set({ songs: [...get().songs, song] }),
+			}),
+			{
+				name: 'SongStore',
+			}
+		)
+	)
+);

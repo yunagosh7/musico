@@ -1,9 +1,5 @@
-import React from 'react'
+import React from 'react';
 
-type Props = {}
-
-export default function BottomNavigation({}: Props) {
-  return (
-    <div>BottomNavigation</div>
-  )
+export default function BottomNavigation() {
+	return <div>BottomNavigation</div>;
 }
