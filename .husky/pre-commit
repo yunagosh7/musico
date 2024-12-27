@@ -1,0 +1,9 @@
+npm run precommit
+
+npm run build
+
+# Add commit message linting to commit-msg hook
+echo "npx commitlint --edit \$1" > .husky/commit-msg
+# Windows users should use ` to escape dollar signs
+echo "npx commitlint --edit `$1`" > .husky/commit-msg
+
