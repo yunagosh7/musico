@@ -8,12 +8,12 @@ type Props = {
 
 export default function LayoutContainer({ children }: Props) {
 	return (
-		<div>
-			<Navbar />
-			<main className="flex">
-				<Sidebar />
-				{children}
-			</main>
+		<div className="flex">
+			<Sidebar />
+			<div className="md:pl-16 md:pt-12">
+				<Navbar />
+				<main className="flex">{children}</main>
+			</div>
 		</div>
 	);
 }

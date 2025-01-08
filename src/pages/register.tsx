@@ -9,12 +9,14 @@ import { useRouter } from 'next/navigation';
 import ControlledInput from '../app/components/controlled/ControlledInput';
 import { emailRequired } from '../rules/emailRequired';
 import { useAuthStore } from '../stores/AuthStore';
+import LoaderIcon from '../app/components/Icons/LoaderIcon';
 
 type FormDataType = { user: IUser };
 
 export default function Register() {
 	const authStore = useAuthStore();
 	const [apiError, setApiError] = useState('');
+	const [isLoading, setIsLoading] = useState(false);
 
 	const router = useRouter();
 
@@ -33,6 +35,7 @@ export default function Register() {
 
 	const onSubmit: SubmitHandler<FormDataType> = async ({ user }) => {
 		setApiError('');
+		setIsLoading(true);
 		try {
 			await authStore.register({
 				email: user.email!,
@@ -42,6 +45,8 @@ export default function Register() {
 		} catch (er) {
 			console.error('Error singing in: ', er);
 			setApiError(er.message);
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
@@ -97,12 +102,12 @@ export default function Register() {
 						<button
 							className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
 							type="submit">
-							Sign Up
+							{isLoading ? <LoaderIcon className="h-4" /> : 'Sign Up'}
 						</button>
 						<Link
 							className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800"
-							href="/register">
-							Register
+							href="/login">
+							Log In
 						</Link>
 					</div>
 				</form>

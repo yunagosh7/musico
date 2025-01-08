@@ -4,51 +4,60 @@
 @tailwind components;
 @tailwind utilities;
 
-
 @layer components {
+	.input {
+		@apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none;
+	}
 
-  .input {
-    @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none 
-  } 
+	.song-card {
+		@apply w-32 h-36 md:w-44 md:h-52 cursor-pointer;
+	}
 
-  .song-card {
-    @apply w-32 h-36 md:w-44 md:h-52 cursor-pointer
-  } 
-  
-  .button {
-    @apply p-4 rounded-3xl text-center
-  }
+	.button {
+		@apply p-4 rounded-3xl text-center;
+	}
 
-  .button-contained-primary {
-    @apply button bg-white-75  
-  }
+	.button-contained-primary {
+		@apply button bg-white-75;
+	}
 
-  .button-outlined-primary {
-    @apply button bg-transparent border-b-white-75 border-[1px]
-  }
+	.button-outlined-primary {
+		@apply button bg-transparent border-b-white-75 border-[1px];
+	}
 
+	.sidebar-items-hover-gradient {
+		@apply bg-gradient-to-r from-white-25 to-white-50;
+	}
+
+	.sidebar-key-item {
+		@apply w-full flex items-center px-3 lg:px-5 gap-2 py-2 rounded-lg hover:sidebar-items-hover-gradient;
+	}
+
+	.sidebar-key-subitem {
+		@apply pl-3 py-1 hover:bg-white-50 rounded-md;
+	}
 }
 
 :root {
-  --background: #0D0D0D;
-  --foreground: #171717;
-  --font-family:  "Roboto", sans-serif;
+	--background: #0d0d0d;
+	--foreground: #171717;
+	--font-family: 'Roboto', sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+	:root {
+		--background: #0a0a0a;
+		--foreground: #ededed;
+	}
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+	color: var(--foreground);
+	background: var(--background);
+	font-family: Arial, Helvetica, sans-serif;
 }
 
 * {
-  font-family: var(--font-family);
-  box-sizing: border-box;
+	font-family: var(--font-family);
+	box-sizing: border-box;
 }
